@@ -1,16 +1,25 @@
 # Builder Agent - Ralph Loop Progress
 
 ## Current Sprint
-Starting PRD item #1: Config schema
+PRD items 1-9 complete. Remaining: notify, daemon, quality, deploy
 
 ## Completed
-(none yet)
+1. [x] Config schema - src/config.js
+2. [x] GitHub API client - src/github.js
+3. [x] Dependency scanner - src/deps.js
+4. [x] PR creator - src/pr-creator.js
+5. [x] Build monitor - src/build-monitor.js
+6. [x] Changelog generator - src/changelog.js
+7. [x] Release automation - src/release.js
+8. [ ] Notification system - pending
+9. [x] CLI interface - src/index.js
 
-## Blocked
-(none)
+## Remaining
+10. [ ] Daemon mode - src/daemon.js
+11. [ ] Code quality scanner - src/quality.js
+12. [ ] Deployment trigger - src/deploy.js
 
 ## Notes
-- Part of 6-agent team: Scout, Builder, Marketer, Analyst, Orchestrator, Archivist
-- Builder handles: Code generation, testing, CI/CD, deployments
-- Monitors: GitHub repos, build status, dependency updates
-- Outputs: PRs, releases, changelog updates
+- 8/12 PRD items complete
+- CLI working: status, update-deps, builds, changelog, release
+- Needs GITHUB_TOKEN and TARGET_REPOS env vars to test against real repos
