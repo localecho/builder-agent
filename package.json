@@ -1,0 +1,37 @@
+{
+  "name": "builder-agent",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Autonomous agent for development automation, CI/CD monitoring, and deployment management",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "builder": "node src/index.js",
+    "daemon": "node src/daemon.js",
+    "status": "node src/index.js status",
+    "update-deps": "node src/index.js update-deps",
+    "changelog": "node src/index.js changelog",
+    "release": "node src/index.js release"
+  },
+  "keywords": [
+    "agent",
+    "ci-cd",
+    "automation",
+    "github",
+    "deployment",
+    "builder"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^20.0.0",
+    "axios": "^1.6.0",
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "conventional-changelog": "^5.1.0",
+    "conventional-commits-parser": "^5.0.0",
+    "dotenv": "^16.3.0",
+    "node-cron": "^3.0.0",
+    "semver": "^7.5.0"
+  }
+}

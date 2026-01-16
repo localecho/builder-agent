@@ -1,0 +1,16 @@
+# Builder Agent - Ralph Loop Progress
+
+## Current Sprint
+Starting PRD item #1: Config schema
+
+## Completed
+(none yet)
+
+## Blocked
+(none)
+
+## Notes
+- Part of 6-agent team: Scout, Builder, Marketer, Analyst, Orchestrator, Archivist
+- Builder handles: Code generation, testing, CI/CD, deployments
+- Monitors: GitHub repos, build status, dependency updates
+- Outputs: PRs, releases, changelog updates
