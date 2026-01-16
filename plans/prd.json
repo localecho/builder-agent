@@ -44,7 +44,7 @@
   {
     "story": "Build notification system (Slack, Discord, email for build events)",
     "priority": 8,
-    "passes": false,
+    "passes": true,
     "verification": "src/notify.js sends alerts for failed builds, merged PRs, releases"
   },
   {
@@ -56,19 +56,19 @@
   {
     "story": "Add daemon mode for continuous repo monitoring",
     "priority": 10,
-    "passes": false,
+    "passes": true,
     "verification": "npm run daemon polls repos on schedule, auto-creates update PRs"
   },
   {
     "story": "Build code quality scanner integration (ESLint, TypeScript errors)",
     "priority": 11,
-    "passes": false,
+    "passes": true,
     "verification": "src/quality.js runs linters and reports issues"
   },
   {
     "story": "Create deployment trigger for successful builds",
     "priority": 12,
-    "passes": false,
+    "passes": true,
     "verification": "src/deploy.js triggers deployment on main branch merge"
   }
 ]

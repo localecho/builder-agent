@@ -1,7 +1,7 @@
 # Builder Agent - Ralph Loop Progress
 
-## Current Sprint
-PRD items 1-9 complete. Remaining: notify, daemon, quality, deploy
+## Status: COMPLETE ✅
+All 12/12 PRD items implemented.
 
 ## Completed
 1. [x] Config schema - src/config.js
@@ -11,15 +11,24 @@ PRD items 1-9 complete. Remaining: notify, daemon, quality, deploy
 5. [x] Build monitor - src/build-monitor.js
 6. [x] Changelog generator - src/changelog.js
 7. [x] Release automation - src/release.js
-8. [ ] Notification system - pending
+8. [x] Notification system - src/notify.js
 9. [x] CLI interface - src/index.js
+10. [x] Daemon mode - src/daemon.js
+11. [x] Code quality scanner - src/quality.js
+12. [x] Deployment trigger - src/deploy.js
 
-## Remaining
-10. [ ] Daemon mode - src/daemon.js
-11. [ ] Code quality scanner - src/quality.js
-12. [ ] Deployment trigger - src/deploy.js
+## CLI Commands
+- `node src/index.js status` - Show repo status
+- `node src/index.js update-deps` - Scan and update dependencies
+- `node src/index.js builds` - Show build status
+- `node src/index.js changelog` - Generate changelog
+- `node src/index.js release` - Create release
+- `node src/daemon.js` - Start continuous monitoring
 
-## Notes
-- 8/12 PRD items complete
-- CLI working: status, update-deps, builds, changelog, release
-- Needs GITHUB_TOKEN and TARGET_REPOS env vars to test against real repos
+## Environment Variables
+- GITHUB_TOKEN - Required for API access
+- TARGET_REPOS - Comma-separated owner/repo list
+- SLACK_WEBHOOK - Optional Slack notifications
+- DISCORD_WEBHOOK - Optional Discord notifications
+- DEPLOY_WEBHOOK - Deployment trigger URL
+- DEPLOY_COMMAND - Deployment shell command
