@@ -2,6 +2,8 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
+import fs from 'fs';
+import path from 'path';
 import config, { validateConfig } from './config.js';
 import { initGitHub, getRepoStatus } from './github.js';
 import { scanDependencies, generateUpdateSummary } from './deps.js';
@@ -9,6 +11,8 @@ import { createDependencyUpdatePR } from './pr-creator.js';
 import { getBuildStatus, getFailedBuildDetails, generateBuildReport } from './build-monitor.js';
 import { generateChangelog } from './changelog.js';
 import { createNewRelease, generateReleaseSummary, isReleaseNeeded } from './release.js';
+import { generateTestFile, generateTestsForDirectory, detectTestFramework, printTestGenSummary } from './test-gen.js';
+import { getErrorSummary, formatErrorReport, getUnacknowledgedErrors, acknowledgeError, seedTestErrors, logError } from './error-monitor.js';
 
 const program = new Command();
 
@@ -282,6 +286,136 @@ program
     }
 
     console.log('');
+  });
+
+/**
+ * Test-gen command - Generate test scaffolds
+ */
+program
+  .command('test-gen')
+  .description('Generate test scaffolds for source files')
+  .argument('[path]', 'File or directory to generate tests for', '.')
+  .option('-o, --output <dir>', 'Output directory for test files')
+  .option('-f, --framework <name>', 'Test framework: jest, vitest, mocha', 'jest')
+  .option('--suffix <suffix>', 'Test file suffix', '.test')
+  .action(async (targetPath, options) => {
+    console.log(chalk.blue.bold('\n🧪 Test Generator\n'));
+
+    const resolvedPath = path.resolve(targetPath);
+    const stat = fs.statSync(resolvedPath);
+
+    // Auto-detect framework if package.json exists
+    const pkgPath = path.join(stat.isDirectory() ? resolvedPath : path.dirname(resolvedPath), 'package.json');
+    const framework = fs.existsSync(pkgPath) ? detectTestFramework(pkgPath) : options.framework;
+    console.log(chalk.gray(`  Framework: ${framework}\n`));
+
+    if (stat.isFile()) {
+      // Generate test for single file
+      console.log(chalk.yellow(`Generating tests for: ${resolvedPath}`));
+      try {
+        const result = generateTestFile(resolvedPath, {
+          outputDir: options.output,
+          framework,
+          suffix: options.suffix,
+        });
+
+        if (result.created) {
+          console.log(chalk.green(`\n✓ Created: ${result.path}`));
+          console.log(chalk.gray(`  Exports covered: ${result.exports}`));
+        } else {
+          console.log(chalk.yellow(`\n⊘ Skipped: ${result.reason}`));
+          if (result.path) console.log(chalk.gray(`  Path: ${result.path}`));
+        }
+      } catch (error) {
+        console.error(chalk.red(`\n✗ Error: ${error.message}`));
+      }
+    } else {
+      // Generate tests for directory
+      console.log(chalk.yellow(`Scanning directory: ${resolvedPath}\n`));
+
+      const results = generateTestsForDirectory(resolvedPath, {
+        outputDir: options.output,
+        framework,
+        suffix: options.suffix,
+      });
+
+      printTestGenSummary(results);
+    }
+
+    console.log('');
+  });
+
+/**
+ * Errors command - Show error monitoring summary
+ */
+program
+  .command('errors')
+  .description('Show error monitoring summary')
+  .option('-h, --hours <hours>', 'Hours to look back', '24')
+  .option('-s, --severity <severity>', 'Filter by severity')
+  .action((options) => {
+    console.log(chalk.blue.bold('\n🔴 Error Monitoring\n'));
+
+    const summary = getErrorSummary({
+      hours: parseInt(options.hours),
+      severity: options.severity
+    });
+
+    console.log(formatErrorReport(summary));
+    console.log('');
+  });
+
+/**
+ * Errors-unack command - Show unacknowledged errors
+ */
+program
+  .command('errors-unack')
+  .description('Show unacknowledged errors')
+  .option('-l, --limit <limit>', 'Max errors to show', '20')
+  .action((options) => {
+    console.log(chalk.blue.bold('\n⚠️ Unacknowledged Errors\n'));
+
+    const errors = getUnacknowledgedErrors({ limit: parseInt(options.limit) });
+
+    if (errors.length === 0) {
+      console.log(chalk.green('  ✓ No unacknowledged errors!\n'));
+      return;
+    }
+
+    for (const error of errors) {
+      const severity = error.severity === 'critical' ? chalk.red : error.severity === 'error' ? chalk.yellow : chalk.gray;
+      console.log(severity(`  [${error.severity.toUpperCase()}] `) + error.source + ': ' + error.message);
+      console.log(chalk.gray(`    ID: ${error.id} | ${new Date(error.timestamp).toLocaleString()}`));
+    }
+    console.log('');
+  });
+
+/**
+ * Error-ack command - Acknowledge an error
+ */
+program
+  .command('error-ack <id>')
+  .description('Acknowledge an error')
+  .action((id) => {
+    const error = acknowledgeError(id);
+
+    if (error) {
+      console.log(chalk.green('\n✓ Acknowledged: ') + error.message);
+    } else {
+      console.log(chalk.red('\n✗ Error not found: ') + id);
+    }
+    console.log('');
+  });
+
+/**
+ * Errors-seed command - Seed test errors
+ */
+program
+  .command('errors-seed')
+  .description('Generate test errors for development')
+  .action(() => {
+    const count = seedTestErrors();
+    console.log(chalk.green('\n✓ Generated ' + count + ' test errors\n'));
   });
 
 // Parse arguments
